@@ -1,242 +1,108 @@
-# Nosana Mastra Agent Template
+# Market Intelligence Agent — Nosana Builders Challenge
 
-A production-ready starter template for building and deploying AI agents using **Mastra** on the **Nosana decentralized compute network**.
+A real-time cryptocurrency market intelligence agent built with [Mastra](https://mastra.ai) and deployed on the [Nosana](https://nosana.com) decentralized GPU network.
 
-## Overview
+## What It Does
 
-This template provides everything you need to build intelligent AI agents with a modern web interface and deploy them on decentralized infrastructure. Built with [Mastra](https://mastra.ai), [CopilotKit](https://copilotkit.ai), and Next.js.
+Ask the agent anything about crypto markets in natural language. It pulls live data from multiple sources and synthesizes it into clear, contextual answers.
 
-### What's Included
+### Tools
 
-- **Mastra framework** - AI agent orchestration and workflow management
-- **Tool calling system** - Connect your agent to external services and APIs
-- **MCP (Model Context Protocol)** support - Enhanced agent capabilities
-- **Modern Next.js frontend** - Beautiful UI for interacting with your agent
-- **Docker configuration** - Ready for containerized deployment
-- **Nosana deployment configs** - Deploy to decentralized GPU infrastructure
+| Tool | Description |
+|------|-------------|
+| `getCryptoPriceTool` | Live price + 24h change for any coin (BTC, ETH, SOL, etc.) |
+| `getTopMoversTool` | Top 5 gainers and losers in the last 24 hours |
+| `getSolanaOnchainTool` | Real-time Solana TPS, epoch, and slot height |
+| `getNewsTool` | Latest crypto news headlines (CryptoPanic) |
+| `getMarketSentimentTool` | Fear & Greed Index with contextual interpretation |
 
-### Agent Use Cases
+### Example Queries
 
-This template can be adapted for various AI agent applications:
+- *"What's the Bitcoin price right now?"*
+- *"What's moving in crypto today?"*
+- *"How's the Solana network performing?"*
+- *"What's the overall market sentiment?"*
+- *"Any news on Ethereum?"*
+- *"Give me a full market overview"*
 
-- 🤖 **Personal Assistant** - Schedule management, email drafting, task automation
-- 📊 **Data Analyst Agent** - Fetch financial data, generate insights, create visualizations
-- 🌐 **Web Researcher** - Aggregate information from multiple sources, summarize findings
-- 🛠️ **DevOps Helper** - Monitor services, automate deployments, manage infrastructure
-- 🎨 **Content Creator** - Generate social media posts, blog outlines, marketing copy
-- 🔍 **Smart Search** - Multi-source search with AI-powered result synthesis
-- 💬 **Customer Support Bot** - Answer FAQs, ticket routing, knowledge base queries
+## Stack
 
-## Getting Started
+- **Agent framework:** [Mastra](https://mastra.ai) (TypeScript)
+- **Frontend:** Next.js 15 + [CopilotKit](https://copilotkit.ai)
+- **Deployment:** [Nosana](https://nosana.com) decentralized GPU compute
+- **Data sources:** CoinGecko (free), Solana RPC, CryptoPanic, Alternative.me Fear & Greed
+
+## Running Locally
 
 ### Prerequisites
 
-- Node.js 18+ and pnpm
-- Docker (for deployment)
-- Git
+- Node.js 18+
+- pnpm (`npm install -g pnpm`)
+- An OpenAI API key **or** [Ollama](https://ollama.com) running locally
 
-### Quick Start
+### Setup
 
 ```bash
-# Clone this repository
-git clone https://github.com/YOUR-USERNAME/nosana-mastra-template
-cd nosana-mastra-template
-
-# Copy environment variables
-cp .env.example .env
+# Clone the repo
+git clone https://github.com/arthurai42069-cloud/agent-challenge
+cd agent-challenge
 
 # Install dependencies
-pnpm i
+pnpm install
 
-# Start the development servers
-pnpm run dev:ui      # Start UI server (port 3000)
-pnpm run dev:agent   # Start Mastra agent server (port 4111)
+# Configure environment
+cp .env.example .env
+# Edit .env and add your LLM credentials (see below)
+
+# Start development servers
+pnpm run dev:agent   # Mastra agent server on port 4111
+pnpm run dev:ui      # Next.js frontend on port 3000
 ```
 
-Open <http://localhost:3000> to see your agent frontend.
-Open <http://localhost:4111> to access the Mastra Agent Playground.
+Open [http://localhost:3000](http://localhost:3000) and start chatting.
 
-### Configure Your LLM
-
-Choose your preferred LLM provider to power your agent:
-
-#### Option A: Local LLM with Ollama (Recommended for Development)
-
-Run Ollama locally (requires [Ollama installed](https://ollama.com/download)):
-
-```bash
-ollama pull qwen3:0.6b
-ollama serve
-```
-
-Update your `.env`:
-```env
-OLLAMA_API_URL=http://127.0.0.1:11434/api
-MODEL_NAME_AT_ENDPOINT=qwen3:0.6b
-```
-
-#### Option B: OpenAI
-
-Add your OpenAI API key to `.env` and uncomment the OpenAI configuration in `src/mastra/agents/index.ts`:
+### Environment Variables
 
 ```env
+# Option 1: OpenAI
 OPENAI_API_KEY=your-openai-api-key
+
+# Option 2: Ollama (local)
+OLLAMA_API_URL=http://127.0.0.1:11434/api
+MODEL_NAME_AT_ENDPOINT=qwen3:8b
+
+# Optional: override model when running on Nosana
+NOS_OLLAMA_API_URL=http://localhost:11434/api
+NOS_MODEL_NAME_AT_ENDPOINT=qwen3:8b
 ```
 
-#### Option C: Custom Endpoint
+All data APIs (CoinGecko, Solana RPC, CryptoPanic, Fear & Greed) are free and require no API keys.
 
-Use any OpenAI-compatible endpoint:
-
-```env
-OLLAMA_API_URL=https://your-custom-endpoint.com/api
-MODEL_NAME_AT_ENDPOINT=your-model-name
-```
-
-## Development Guide
-
-### 1. Build Your Agent
-
-Implement your agent logic in the Mastra framework:
-
-1. **Define your tools** - Create custom functions in `src/mastra/tools/`
-2. **Configure your agent** - Update agent behavior in `src/mastra/agents/`
-3. **Test locally** - Validate functionality at http://localhost:3000 and http://localhost:4111
-
-### 2. Customize the Frontend
-
-Modify the Next.js frontend to match your agent's functionality:
-
-- Update UI components in `src/app/`
-- Customize the chat interface
-- Add custom visualizations or controls
-
-### 3. Containerize Your Application
-
-Package your agent for deployment:
+## Deployment on Nosana
 
 ```bash
-# Build your Docker container
-docker build -t yourusername/nosana-mastra-agent:latest .
+# Build Docker image
+docker build -t yourusername/nosana-market-agent:latest .
 
-# Test the container locally
-docker run -p 3000:3000 yourusername/nosana-mastra-agent:latest
-
-# Push to Docker Hub
-docker login
-docker push yourusername/nosana-mastra-agent:latest
+# Deploy using Nosana job definition
+nosana job submit --file nos_job_def/nosana_mastra.yml
 ```
 
-The provided `Dockerfile` bundles:
-- Your Mastra agent
-- Frontend interface
-- LLM runtime (all-in-one container)
+See the [Nosana docs](https://docs.nosana.com) for full deployment instructions.
 
-### 4. Deploy to Nosana
-
-Deploy your containerized agent to Nosana's decentralized GPU network (see deployment section below).
-
-## Project Structure
+## Architecture
 
 ```
-├── src/
-│   ├── app/              # Next.js frontend
-│   ├── mastra/           # Mastra agent configuration
-│   │   ├── agents/       # Agent definitions
-│   │   └── tools/        # Custom tool implementations
-│   └── lib/              # Shared utilities
-├── nos_job_def/          # Nosana deployment configs
-├── Dockerfile            # Container configuration
-└── .env.example          # Environment variables template
+User ──→ Next.js UI (CopilotKit) ──→ /api/copilotkit ──→ Mastra Agent
+                                                              │
+                                          ┌───────────────────┤
+                                          ▼                   ▼
+                                    CoinGecko API      Solana RPC
+                                    CryptoPanic        Fear&Greed API
 ```
 
-## 🚀 Deploying to Nosana
-
-Deploy your AI agent to Nosana's decentralized GPU network for production use.
-
-### Method 1: Using Nosana Dashboard (Easiest)
-
-1. Open [Nosana Dashboard](https://dashboard.nosana.com/deploy)
-2. Click `Expand` to open the job definition editor
-3. Edit `nos_job_def/nosana_mastra_job_definition.json` with your Docker image:
-   ```json
-   {
-     "image": "yourusername/nosana-mastra-agent:latest"
-   }
-   ```
-4. Copy and paste the edited job definition into the dashboard
-5. Select your preferred GPU type
-6. Click `Deploy`
-
-### Method 2: Using Nosana CLI
-
-Install the Nosana CLI and deploy from your terminal:
-
-```bash
-# Install Nosana CLI
-npm install -g @nosana/cli
-
-# Deploy your agent
-nosana job post --file ./nos_job_def/nosana_mastra_job_definition.json --market nvidia-3090 --timeout 30
-```
-
-### Deployment Configuration
-
-The job definition file includes:
-- Docker image reference
-- Resource requirements (GPU, memory, CPU)
-- Network exposure settings
-- Environment variables
-
-Modify `nos_job_def/nosana_mastra_job_definition.json` to customize your deployment.
-
-## Why Deploy on Nosana?
-
-- **Decentralized Infrastructure** - Run on distributed GPU nodes worldwide
-- **Cost-Effective** - Competitive pricing for GPU compute
-- **Censorship-Resistant** - No single point of control or failure
-- **Scalable** - Easy to scale your agent across multiple nodes
-- **Transparent** - On-chain job execution and verification
-
-## 📚 Documentation & Resources
-
-### Framework Documentation
-- [Mastra Documentation](https://mastra.ai/en/docs) - Complete guide to the Mastra framework
-- [Mastra Agents Overview](https://mastra.ai/en/docs/agents/overview) - Understanding AI agents
-- [Mastra Tool Calling](https://mastra.ai/en/docs/agents/tools) - Implementing custom tools
-- [Build an AI Stock Agent Guide](https://mastra.ai/en/guides/guide/stock-agent) - Complete tutorial
-- [CopilotKit Documentation](https://docs.copilotkit.ai) - Frontend AI integration
-
-### Platform Documentation
-- [Nosana Documentation](https://docs.nosana.io) - Complete Nosana platform guide
-- [Nosana CLI](https://github.com/nosana-ci/nosana-cli) - Command-line deployment
-- [Nosana SDK](https://github.com/nosana-ci/nosana-sdk) - JavaScript SDK
-
-### Additional Resources
-- [Next.js Documentation](https://nextjs.org/docs) - Next.js features and API
-- [Docker Documentation](https://docs.docker.com) - Container best practices
-
-## 🆘 Support & Community
-
-Need help or want to connect with other builders?
-
-- **Discord** - Join [Nosana Discord](https://nosana.com/discord) for technical support
-- **Twitter/X** - Follow [@nosana_ai](https://x.com/nosana_ai) for updates
-- **GitHub** - Report issues or contribute to the repos
-
-## Contributing
-
-Contributions are welcome! Feel free to:
-- Submit bug reports or feature requests
-- Improve documentation
-- Share your agent implementations
-- Contribute code improvements
+The agent uses Mastra's tool-calling system to fetch real-time data and synthesize responses. All API calls include error handling — if a source is unavailable, the agent continues with available data.
 
 ## License
 
-This template is open source and available under the MIT License.
-
----
-
-**Built with Mastra • Deployed on Nosana • Powered by decentralized AI**
-
-
+MIT
